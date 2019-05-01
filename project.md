@@ -1,6 +1,7 @@
 Review of Ethereum
 
 1. Overview of Ethereum:
+
 If bitcoin represents blockchain 1.0, then Ethereum represents blockchain 2.0. Ethereum has been improved for many problems in Bitcoin, and many completely different mechanisms have been designed. Compared with Bitcoin, the main features are as follows:
 (1) The bitcoin block generation time is about 60 minutes, and Ethereum will shorten the time to about a dozen seconds.
 (2) Based on the consensus mechanism in Bitcoin, Ethereum has designed a more complex consensus mechanism based on GHOST protocol.
@@ -19,6 +20,7 @@ There are two types of accounts in Ethereum, externally owned account and smart 
 As Ethereum supports smart contracts, participants are required to have a stable identity, which ensures that the person signing the contract is both responsible and profitable. The problem with this design is that privacy protection does not work well compared with Bitcoin. But you can also learn from Bitcoin and create multiple Ethereum accounts to protect your privacy.
 
 2. Ethereum’s State Tree:
+
 We need to find a data structure and make a mapping from the account address to the account status. The address of the Ethereum account is 160 bits, which is 20 bytes and 40 hexadecimal numbers.
 
 In Bitcoin, thousands of transactions in a block form a merkle tree to prove that a transaction belongs to the merkle tree, which is merkle proof. As Bitcoin is transaction-based, each merkle tree will not be large. However, Ethereum is account-based. If all the accounts generate a merkle tree, each state update will regenerate the merkle tree, which is very expensive.
@@ -36,6 +38,7 @@ The structure of the block header is shown in the figure.
 In the key-value pair in the MPT, the key is the account address, and the value is the account status. The storage of value needs to be serialized, using RLP (Recursive Length Prefix), and finally becomes nested array of bytes. The content here is more complicated and will not be described in detail.
 
 3. Ethereum's Trading Tree and Receipt Tree:
+
 We have just introduced the most complicated state tree in the three trees of Ethereum. What about the other two trees? Ethereum's trading tree is similar to the tree in Bitcoin, and each transaction has a receipt, and the nodes of the transaction tree and the receipt tree are one-to-one. The receipt tree is designed for quick results from smart contracts. Both the transaction tree and the receipt tree use MPT. There is no special reason for this. It may be to unify the data structure of the three trees and to search them more quickly (again by merkle proof).
 So what is the difference between the three trees? The status tree represents the global situation, and the transaction tree and receipt tree represent the current changes. The state tree is a shared node, and the following nodes inherit the previous node. However, both the transaction tree and the receipt tree are internally independent.
 
@@ -44,6 +47,7 @@ More complex query operations need to introduce a data structure, bloom filter, 
 In this way, Ethereum is a transaction-driven state machine. In fact, Bitcoin is also a transaction-driven state machine, the state is UTXO, moving from the current state to the next state. It should be noted that the state transitions of Ethereum and Bitcoin are deterministic. So everyone must reach a consensus, each node must maintain the same data locally.
 
 4. Ethereum Consensus Mechanism GHOST:
+
 As I mentioned earlier, like Bitcoin, Ethereum must also reach a consensus. What is the difference between Ethereum's consensus mechanism and Bitcoin? Ethereum's block generation rate is very fast, and it is too late to broadcast new blocks. Some miners may dig up other blocks attached to the front blocks. In this way, Ethereum's forks are much more than bitcoin. If the miners' rewards on the forked chain are invalidated, the miners' enthusiasm will be much lower.
 Then we can design a mechanism to allow some of the failed miners to still have rewards. Uncle block means that the first block of the forked chain is the uncle block of the new block of the longest legal chain. If it is recorded as uncle block by the new block, you can get 7/8*bonus reward, and the new block can also get 1/32*bonus reward. The new block can record up to two uncle blocks.
 
@@ -53,6 +57,7 @@ Miners in Bitcoin have two rewards, static reward is block reward, and dynamic r
 There is still a question, can the block behind the uncle blocks be rewarded? No, otherwise it is easy to cause a forking attack, in that case the cost of a fork will be lower.
 
 5. The Mining Algorithm of Ethereum:
+
 There is a famous saying that the blockchain is secured by mining. Bitcoin's mining algorithm is bug bounty, and no shortcuts have been found so far, so it is a good algorithm. However, Bitcoin's algorithm consumes a lot of energy on the one hand, and on the other hand, the trend of Bitcoin mining is ASIC mining and the formation of a mining pool. This is unfair to individual miners, and mining centralization is very beneficial. Moreover, there are many connections in the mining pool, and the released blocks are accepted by other nodes more quickly. The advantages of the mining pool are getting bigger and bigger, which is also known as centralization bias.
 
 Nakamoto said that one CPU, one vote. This idea is not implemented in Bitcoin. Ethereum designed the memory hard mining puzzle for ASIC resistance. Drawing on historical experience, Litecoin has also used this kind of puzzle, which is characterized by the need to save arrays in memory, otherwise the computational complexity of mining is greatly increased. However, it is very difficult for each SPV to verify, which violates one of the principles of puzzle, difficult to solve, but easy to verify.
@@ -67,11 +72,13 @@ Another difference between Ethereum's mining and Bitcoin’s mining is that Ethe
 The mining situation of Ethereum is shown in the figure.
 
 6. Ethereum Difficulty Adjustment Algorithm:
+
 Ethereum difficulty adjustment algorithm is shown in the figure.
 
 The difficulty adjustment of Ethereum is similar to Bitcoin, but there are many differences. The first one is that uncle blocks will affect the difficulty. The second is to deal with hacking or other black swan events, the difficulty is reduced by up to 99 at a time. The third is to have a difficulty bomb. It increases exponentially as the block number increases. The design of the difficulty bomb was originally designed to force the miners to switch during the transition from POW to POS, because it is difficult to insist on mining when the bomb is large enough. But now POS has not been developed yet, the difficulty bomb is already very large, so it has retreated 3 million blocks and adjusted the bonus from 5 to 3. Note that the bonus is not decremented like Bitcoin, but is only adjusted for the difficulty bomb. After the difficulty is reduced, if it is still 5 rewards, it is unfair to the miners who solve the difficult problem ahead.
 
 7. Proof of Stake:
+
 There are many people who say Bitcoin mining is very resource-intensive. These resources all need to consume funds. Whoever has more funds can use more resources for mining. Since it is the amount of money for the competition, why don’t you directly compare funds? That is virtual mining. The advantages are: (1) eliminating the mining process, saving resources (2) forming an internal ecological closed loop, reducing external influences (internal use of digital currency voting, rather than external funds)
 But the miners with the most amount of money in the POS have the greatest possibility to win every time, so the security deposit needs to be locked for a while. This is Proof of Deposit. At the same time, another challenge for POS is the problem of betting on both sides, and another is the nothing at stake problem. Mining on both sides, if one side mines successfully, the other side of the deposit will not be locked.
 
@@ -86,6 +93,7 @@ Validator can be rewarded for participating in the verification, and there will 
 Now POS is still not very mature, and like Bitcoin, 51% of attacks still exist. So now Ethereum is still in the transition phase. There is now a digital currency called EOS that uses a full POS. This POS is called DPOS (Delegated Proof of Stake). Vote for 21 super nodes first, and then the super nodes generate consensus. Maybe in the future Ethereum will use this approach, DPOS needs the test of bug bounty.
 
 8. Smart Contract:
+
 Supporting for smart contracts an important change from Bitcoin for Ethereum. A smart contract is a piece of code that runs on a blockchain, and the logic of the code defines the content of the contract. The smart contract's account holds the current running status of the contract. Balance represents the current balance. Nonce represents the number of transactions. Code stands for contract code. Storage represents the storage of the state, and the data structure is an MPT. Solidity is the most commonly used language for smart contracts and is syntactically similar to Javascript.
 
 A transfers money to B. If B is an externally owned account, then it is a normal transfer. If B is a smart contract account, then the contract is called. The specific function of the contract is called in the data field. The value is 0, because it is not a normal transfer, but a contract. But it takes a certain amount of gas. A contract can also call another contract, there are at least three ways. The first method is to call it directly. The second method is to use the call function of the address type. The third method is delegatecall. For example, the smart contract in the auction has a bid function, and each bidder calls the bid function to bid, and simultaneously sends the corresponding amount of Ethers. Use the withdraw function to retrieve the locked Ethers that failed to bid. All functions that accept external transfers need to add the payable keyword. By default, the fallback function is called.
